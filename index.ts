@@ -18,6 +18,8 @@ limitations under the License.
 
 ******************************************************************************/
 
+import { type PyodideAPI } from '@pyodide/pyodide'
+
 import * as $rdf from '@editor/metadata'
 
 //==============================================================================
@@ -109,12 +111,12 @@ let packagesLoaded = false
 //==============================================================================
 
 export class BG2CellML {
-    #pyodide: Object = globalThis.pyodide
+    #pyodide: PyodideAPI = globalThis.pyodide
 
     async bg2cellml() {
-        this.#checkPyodide().then(loaded => {
+        this.#checkPyodide().then(async (loaded) => {
             if (loaded) {
-                this.#pyodide.runPythonAsync(`
+                await this.#pyodide.runPythonAsync(`
                     import bg2cellml.version as version
                     print('bg2cellml version', version.__version__)
                 `)
@@ -123,16 +125,16 @@ export class BG2CellML {
     }
 
     async rdfTest() {
-        this.#checkPyodide().then(loaded => {
+        this.#checkPyodide().then(async (loaded) => {
             if (loaded) {
-                this.#pyodide.runPythonAsync(rdfTestPython)
+                await this.#pyodide.runPythonAsync(rdfTestPython)
             }
         })
     }
 
-    async #checkPyodide(): boolean {
+    async #checkPyodide(): Promise<boolean> {
         if (!this.#pyodide) {
-            console.error("Pyodide hasn't loaded...")
+            console.error("Pyodide did not load...")
             return false
         } else if (!packagesLoaded) {
             await this.#loadPackages()
@@ -144,7 +146,7 @@ export class BG2CellML {
     async #loadPackages() {
         this.#pyodide.registerJsModule("rdf", rdfModule)
         for (const pkg of pythonPackages) {
-            await pyodide.loadPackage(`/pyodide/wheels/${pkg}`)
+            await this.#pyodide.loadPackage(`/pyodide/wheels/${pkg}`)
         }
     }
 }
