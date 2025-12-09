@@ -97,6 +97,7 @@ const pythonPackages = [
     'flexcache-0.3-py3-none-any.whl',
     'flexparser-0.4-py3-none-any.whl',
     'lark-1.3.1-py3-none-any.whl',
+    'lxml-6.0.2-cp313-cp313-pyodide_2025_0_wasm32.whl',
     'mpmath-1.3.0-py3-none-any.whl',
     'networkx-3.5-py3-none-any.whl',
     'pint-0.25-py3-none-any.whl',
