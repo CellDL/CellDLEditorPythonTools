@@ -55,7 +55,7 @@ select ?uri ?type where {
 #===============================================
 
 store = rdf.RdfStore()
-store.load(ttl, 'https://bg-rdf.org/store')
+store.load('https://bg-rdf.org/store', ttl)
 
 statements = store.statements()
 print('Statements:')
