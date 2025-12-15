@@ -85,8 +85,8 @@ const rdfModule = {
     isLiteral: $rdf.isLiteral,
     isNamedNode: $rdf.isNamedNode,
 
-    RdfStore: function(documentUri: string): $rdf.RdfStore {
-        return new $rdf.RdfStore(documentUri)
+    RdfStore: function(): $rdf.RdfStore {
+        return new $rdf.RdfStore()
     }
 }
 
