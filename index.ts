@@ -95,18 +95,20 @@ export class BG2CellML {
         if (!this.#pyodide) {
             console.error("Pyodide did not load...")
             return false
-        } else if (!packagesLoaded) {
-            await this.#loadPackages()
-            packagesLoaded = true
+        } else {
+            await navigator.locks.request("load-packages", async (lock) => {
+                if (!packagesLoaded) {
+                    await this.#loadPackages()
+                    packagesLoaded = true
+                }
+            })
+            return true
         }
-        return true
     }
 
     async #loadPackages() {
         this.#pyodide.registerJsModule("rdf", rdfModule)
-        for (const pkg of pythonPackages) {
-            await this.#pyodide.loadPackage(`/pyodide/wheels/${pkg}`)
-        }
+        await this.#pyodide.loadPackage(pythonPackages.map(pkg => `/pyodide/wheels/${pkg}`))
     }
 }
 
