@@ -20,9 +20,9 @@ limitations under the License.
 
 import { type PyodideAPI } from '@pyodide/pyodide'
 
-import * as $rdf from '@editor/metadata'
+import * as $rdf from '@editor/metadata/index'
 
-
+//==============================================================================
 
 import { test as rdfTest } from './test'
 
