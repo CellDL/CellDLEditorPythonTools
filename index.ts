@@ -31,7 +31,7 @@ import { test as runTest } from './test'
 
 const rdfModule = {
     blankNode: $rdf.blankNode,
-    literal: function(value: any, options={}) {
+    literal: (value: any, options={}) => {
         if ('datatype' in options) {
             // @ts-expect-error:
             return $rdf.literal(value, options.datatype)
@@ -44,9 +44,7 @@ const rdfModule = {
     isLiteral: $rdf.isLiteral,
     isNamedNode: $rdf.isNamedNode,
 
-    RdfStore: function(): $rdf.RdfStore {
-        return new $rdf.RdfStore()
-    }
+    RdfStore: (): $rdf.RdfStore => new $rdf.RdfStore()
 }
 
 //==============================================================================
