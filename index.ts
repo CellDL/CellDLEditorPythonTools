@@ -90,20 +90,23 @@ if framework.has_issues:
 let pyodide: PyodideAPI
 let bg2cellmlGlobals: PyProxy
 
-export async function initialisePyodide(pyodideApi: PyodideAPI) {
+export async function initialisePyodide(pyodideApi: PyodideAPI, loadingMessage: vue.ref<string>) {
     pyodide = pyodideApi
     if (globalThis.pyodideInitialised === undefined) {
         pyodide.registerJsModule("oximock", rdfModule)
+        loadingMessage.value = 'Loading Python packages...'
         await pyodide.loadPackage(pythonPackages.map(pkg => `/python/wheels/${pkg}`), {
             messageCallback: ((_: string) => { })       // Suppress loading messages
         })
 
+        loadingMessage.value = 'Loading RDF framework...'
         bg2cellmlGlobals = pyodide.globals.get("dict")()
         await pyodide.runPythonAsync(SETUP_FRAMEWORK, { globals: bg2cellmlGlobals })
 
         console.log('Initialised BG-RDF framework 😊...')
         globalThis.pyodideInitialised = true
     }
+    loadingMessage.value = ''
 }
 
 //==============================================================================
