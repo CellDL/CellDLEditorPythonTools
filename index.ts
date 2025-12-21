@@ -27,7 +27,13 @@ import type { PyProxy } from "@pyodide/ffi.d.ts"
 
 import * as $rdf from '@editor/metadata/index'
 
+import { getBgRdf } from './celldl'
 import { test as runTest } from './test'
+
+export interface CellMLOutput {
+    cellml?: string
+    issues?: string[]
+}
 
 //==============================================================================
 
@@ -126,12 +132,18 @@ bg2cellml
 `
 //==============================================================================
 
-function bg2cellml(uri: string, bg_rdf: string, debug: boolean=false) {
+function bg2cellml(uri: string, bgRdf: string, debug: boolean=false): CellMLOutput {
     const bg2cellml = pyodide.runPython(RUN_BG2CELLML, { globals: bg2cellmlGlobals })
-    return bg2cellml(uri, bg_rdf, debug)
+    return bg2cellml(uri, bgRdf, debug)
 }
 
-export async function testBg2cellml() {
+export function celldl2cellml(uri: string, celldl: string, debug: boolean=false): CellMLOutput {
+    const bgRdf = getBgRdf(celldl)
+    const bg2cellml = pyodide.runPython(RUN_BG2CELLML, { globals: bg2cellmlGlobals })
+    return bg2cellml(uri, bgRdf, debug)
+}
+
+export async function testBg2cellml(): Promise<CellMLOutput> {
     const model_uri = '/models/bvc.ttl'
     const full_uri = 'http://localhost/models/bvc.ttl'
 
