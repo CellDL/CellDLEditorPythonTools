@@ -104,9 +104,9 @@ export async function initialisePyodide(pyodideApi: PyodideAPI, loadingMessage: 
             messageCallback: ((_: string) => { })       // Suppress loading messages
         })
 
-        loadingMessage.value = 'Loading RDF framework'
+//        loadingMessage.value = 'Loading RDF framework'
         bg2cellmlGlobals = pyodide.globals.get("dict")()
-        await pyodide.runPythonAsync(SETUP_FRAMEWORK, { globals: bg2cellmlGlobals })
+//        await pyodide.runPythonAsync(SETUP_FRAMEWORK, { globals: bg2cellmlGlobals })
 
         console.log('Initialised BG-RDF framework 😊...')
         globalThis.pyodideInitialised = true
