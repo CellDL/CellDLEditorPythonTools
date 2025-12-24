@@ -100,7 +100,7 @@ export async function initialisePyodide(pyodideApi: PyodideAPI, loadingMessage: 
     if (globalThis.pyodideInitialised === undefined) {
         pyodide.registerJsModule("oximock", rdfModule)
         loadingMessage.value = 'Loading Python packages'
-        await pyodide.loadPackage(pythonPackages.map(pkg => `/python/wheels/${pkg}`), {
+        await pyodide.loadPackage(pythonPackages.map(pkg => `${import.meta.env.BASE_URL}python/wheels/${pkg}`), {
             messageCallback: ((_: string) => { })       // Suppress loading messages
         })
 
