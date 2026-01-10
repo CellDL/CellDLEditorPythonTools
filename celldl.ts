@@ -19,7 +19,7 @@ limitations under the License.
 ******************************************************************************/
 
 import { CELLDL_METADATA_ID } from '@editor/diagram/index'
-import { TurtleContentType } from '@editor/metadata/index'
+import { TurtleContentType } from '@renderer/metadata/index'
 
 //==============================================================================
 
