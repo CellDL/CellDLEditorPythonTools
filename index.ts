@@ -73,7 +73,7 @@ const rdfModule = {
 //==============================================================================
 
 const pythonPackages = [
-    'bg2cellml-0.8.6-py3-none-any.whl',
+    'bg2cellml-0.8.7-py3-none-any.whl',
     'flexcache-0.3-py3-none-any.whl',
     'flexparser-0.4-py3-none-any.whl',
     'lark-1.3.1-py3-none-any.whl',
