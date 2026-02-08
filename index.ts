@@ -51,6 +51,7 @@ const parts = pyodideAsmUrl.split('/')
 const pyodideBase = parts.slice(0, -1).join('/')
 
 export async function initialisePython(status: (msg:string) => void) {
+    status('Loading Python interpreter')
     loadPyodide({
         indexURL: pyodideBase
     }).then(async (pyodide: PyodideAPI) => {
