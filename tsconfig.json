@@ -1,15 +1,23 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
-        "composite": true,
-        "lib": ["dom", "esnext"],
-        "module": "esnext",
-        "moduleResolution": "bundler",
-        "noEmit": false,
-        "strictNullChecks": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "esModuleInterop": true,
         "resolveJsonModule": true,
-        "target": "esnext",
-        "types": ["vite/client"]
-    },
-    "include": ["**/*.js", "**/*.ts", "package.json"]
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "jsx": "preserve",
+        "allowJs": true,
+        /* strict rules */
+        "strict": true,
+        "strictNullChecks": true,
+        /* using bundler to build output */
+        "moduleResolution": "Bundler",
+        "moduleDetection": "auto",
+        "noEmit": true,
+        "types": [
+            "vite/client"
+        ]
+    }
 }
