@@ -1,8 +1,8 @@
 /******************************************************************************
 
-CellDL Editor
+CellDL Editor Tools
 
-Copyright (c) 2022 - 2025 David Brooks
+Copyright (c) 2022 - 2026 David Brooks
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,18 +18,17 @@ limitations under the License.
 
 ******************************************************************************/
 
-import type * as vue from 'vue'
+import { loadPyodide, type PyodideAPI } from 'pyodide'
 
-import { loadPyodide } from '@renderer/assets/pyodide/pyodide.mjs'
-import type { PyodideAPI } from '@renderer/assets/pyodide/pyodide'
-import type { PyProxy } from "@renderer/assets/pyodide/ffi"
+//import type { PyProxy } from "pyodide/ffi"
 
 //==============================================================================
 
-import * as $rdf from '@renderer/metadata/index'
+//import * as $rdf from '@renderer/metadata/index'
 
-import { getBgRdf } from './celldl'
-import { test as runTest } from './test'
+//import { getBgRdf } from './celldl'
+
+//import { test as runTest } from './test'
 
 export interface CellMLOutput {
     cellml?: string
@@ -38,7 +37,7 @@ export interface CellMLOutput {
 
 //==============================================================================
 
-const pythonWheelUrls = import.meta.glob('@renderer/assets/wheels/*.whl', {
+const pythonWheelUrls = import.meta.glob('./src/assets/wheels/*.whl', {
     query: '?url',
     import: 'default',
     eager: true
@@ -49,30 +48,21 @@ const pythonPackages: string[] = [...Object.values(pythonWheelUrls)]
 
 //==============================================================================
 
-// Load Pyodide's WASM module, our Python packages, and setup `bg2cellml`
-// conversion
-
-// This results in Vite bundling these files...
-import pyodideAsmUrl from "@renderer/assets/pyodide/pyodide.asm.js?url"
-import pyodideWasmUrl from "@renderer/assets/pyodide/pyodide.asm.wasm?url"
-import stdlibUrl from "@renderer/assets/pyodide/python_stdlib.zip?url"
-import lockUrl from "@renderer/assets/pyodide/pyodide-lock.json?url"
-
-const parts = pyodideAsmUrl.split('/')
-const pyodideBase = parts.slice(0, -1).join('/')
-
 export async function initialisePython(status: (msg:string) => void) {
     status('Loading Python interpreter')
     loadPyodide({
-        indexURL: pyodideBase
+//        indexURL: pyodideBase
     }).then(async (pyodide: PyodideAPI) => {
-        await initialisePyodide(pyodide, status)
+//        await initialisePyodide(pyodide, status)
+        console.log(pyodide)
         status('')
     })
 }
 
 //==============================================================================
 //==============================================================================
+
+/****
 
 const rdfModule = {
     blankNode: $rdf.blankNode,
@@ -195,3 +185,5 @@ export async function rdfTest() {
 
 //==============================================================================
 //==============================================================================
+
+***/
