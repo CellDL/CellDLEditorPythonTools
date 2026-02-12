@@ -29,5 +29,8 @@ out
 *.sublime-workspace
 *.tsbuildinfo
 
+# Cache used for bundling wheels
+cache
+
 # BG-RDF
 src/assets/bg-rdf
