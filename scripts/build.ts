@@ -7,14 +7,23 @@
  *
  */
 
+import crypto from 'node:crypto'
 import fs from 'node:fs'
+import stream from 'node:stream/promises'
 
-import { loadPyodide } from 'pyodide'
+import AdmZip from 'adm-zip'
+
+import { loadPyodide, type LockfilePackage, type PackageData } from 'pyodide'
 import { build, type Options } from 'tsup'
 
 const packageCacheDir = './cache'
 const versionInfoPath = `${packageCacheDir}/PYODIDE_VERSION`
 
+// Don't specify that `bg2cellml` depends on`pyoxigraph`
+const BG2CELLML_PACKAGE = 'bg2cellml'
+const BG2CELLML_EXCLUDE = ['pyoxigraph']
+
+// Entry points
 const entries = ['index', 'node', 'web', 'vite']
 const basicExports = Object.fromEntries(
   entries.map(k => [
@@ -37,7 +46,7 @@ const typesVersions = {
 
 const wheelDir = './wheels'
 const wheelFiles = fs.readdirSync(wheelDir).filter(name => name.endsWith('.whl'))
-const wheelNames: string[] = []
+const lockFilePackages: Record<string, LockfilePackage> = {}
 
 const extraAssetsExports: Record<string, string> = {}
 
@@ -68,6 +77,50 @@ function checkCachedWhl(fileNames: string[]) {
     if (name.endsWith('.whl')) {
       extraAssetsExports[name] = `./dist/${name}`
     }
+  }
+}
+
+const DEPENDS_RE = /Requires-Dist: ([^<|>|=]*)/
+
+async function addCachedWheel(pkg: PackageData) {
+  const distInfoDir = `${pkg.name}-${pkg.version}.dist-info`
+  const wheelFile = `${packageCacheDir}/${pkg.fileName}`
+  const packageName = pkg.name.replace('_', '-')
+
+  const wheelZip = new AdmZip(wheelFile)
+  const imports = wheelZip.readAsText(`${distInfoDir}/top_level.txt`).trim().split('\n').filter(i => !!i)
+  if (imports.length === 0) {
+    imports.push(pkg.name)
+  }
+  const requires: string[] = []
+  const metadata = wheelZip.readAsText(`${distInfoDir}/METADATA`)
+  for (const line of metadata.split('\n')) {
+    if (line === '' || line.startsWith('Provides-Extra:')) {
+      break
+    } else if (line.startsWith('Requires-Dist:')) {
+      const match = line.match(DEPENDS_RE)
+      if (match) {
+        const dependency = match[1]
+        if (packageName !== BG2CELLML_PACKAGE || !BG2CELLML_EXCLUDE.includes(dependency)) {
+          requires.push(dependency)
+        }
+      }
+    }
+  }
+  const wheelStream = fs.createReadStream(wheelFile)
+  const hash256 = crypto.createHash('sha256')
+  await stream.pipeline(wheelStream, hash256)
+  const sha256 = hash256.digest('hex')
+
+  lockFilePackages[packageName] = {
+    name: packageName,
+    file_name: pkg.fileName,
+    package_type: pkg.packageType,
+    version: pkg.version,
+    depends: requires,
+    imports: imports,
+    install_dir: 'site',
+    sha256: sha256,
   }
 }
 
@@ -196,9 +249,8 @@ loadPyodide({ packageCacheDir })
       fs.access(cachedPackageWheel, fs.constants.F_OK, (_) => {
         fs.cpSync(`${wheelDir}/${fileName}`, cachedPackageWheel)
       })
-      const pkg = await api.loadPackage(cachedPackageWheel)
-      const name =  pkg[0].name
-      wheelNames.push(name)
+      const pkgData: PackageData[] = await api.loadPackage(cachedPackageWheel)
+      await addCachedWheel(pkgData[0])
     }
     return api
   })
@@ -219,7 +271,7 @@ loadPyodide({ packageCacheDir })
         const json = JSON.parse(data)
         return JSON.stringify({
           ...json,
-          packages: Object.fromEntries(wheelNames.map(name => [ name, json.packages[name] ]))
+          packages: lockFilePackages
         })
       },
     )
