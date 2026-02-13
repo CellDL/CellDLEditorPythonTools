@@ -1,0 +1,65 @@
+{
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "off"
+            }
+        }
+    },
+    "formatter": {
+        "includes": ["**/*.css", "**/*.html", "**/*.js", "**/*.json", "**/*.ts", "**/*.vue"],
+        "indentWidth": 4,
+        "indentStyle": "space",
+        "lineWidth": 120
+    },
+    "css": {
+        "formatter": {
+            "enabled": true
+        }
+    },
+    "html": {
+        "formatter": {
+            "bracketSameLine": true,
+            "enabled": true,
+            "selfCloseVoidElements": "always",
+            "whitespaceSensitivity": "ignore"
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "semicolons": "asNeeded",
+            "trailingCommas": "none"
+        }
+    },
+    "linter": {
+        "includes": ["**/*.css", "**/*.js", "**/*.ts", "**/*.vue", "!**/components.d.ts"]
+    },
+    "overrides": [
+        {
+            "includes": ["**/*.css"],
+            "linter": {
+                "rules": {
+                    "complexity": {
+                        "noImportantStyles": "off"
+                    }
+                }
+            }
+        },
+        {
+            "includes": ["**/*.vue"],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "useConst": "off",
+                        "useImportType": "off"
+                    },
+                    "correctness": {
+                        "noUnusedImports": "off",
+                        "noUnusedVariables": "off"
+                    }
+                }
+            }
+        }
+    ]
+}
