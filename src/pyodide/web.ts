@@ -6,21 +6,16 @@
  *
  */
 
+import { loadPyodide, type PyodideAPI } from 'pyodide'
+
 import type { LoadInBrowserOption } from './types'
-import type { PyodideInterface } from 'pyodide'
-
-import { loadPyodide } from 'pyodide'
-
 export type { LoadInBrowserOption } from './types'
+
 /**
- * Load `fonttools` in `browser`, default index URL is `import.meta.url`
+ * Load `pyodide` in the browser using the loader wrapped for Vite
  */
 export async function loadInBrowser(
   options: LoadInBrowserOption = {},
-): Promise<PyodideInterface> {
-  const packages = ['fonttools']
-  if (options?.woff2) {
-    packages.push('brotli')
-  }
-  return await loadPyodide({ ...options, packages })
+): Promise<PyodideAPI> {
+  return await loadPyodide(options)
 }

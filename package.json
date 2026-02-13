@@ -34,6 +34,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "default": "./dist/node.js"
+    },
+    "./web": {
+      "types": "./dist/web.d.ts",
+      "import": "./dist/web.js",
+      "default": "./dist/web.js"
+    },
     "./vite": {
       "types": "./dist/vite.d.ts",
       "import": "./dist/vite.js",
@@ -59,6 +69,12 @@
   },
   "typesVersions": {
     "*": {
+      "node": [
+        "./dist/node.d.ts"
+      ],
+      "web": [
+        "./dist/web.d.ts"
+      ],
       "vite": [
         "./dist/vite.d.ts"
       ]
