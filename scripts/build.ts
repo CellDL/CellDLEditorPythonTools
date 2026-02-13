@@ -10,7 +10,7 @@
 import fs from 'node:fs'
 
 import { loadPyodide } from 'pyodide'
-import { build } from 'tsup'
+import { build, type Options } from 'tsup'
 
 const packageCacheDir = './cache'
 const versionInfoPath = `${packageCacheDir}/PYODIDE_VERSION`
@@ -37,15 +37,16 @@ const typesVersions = {
 
 const wheelDir = './wheels'
 const wheelFiles = fs.readdirSync(wheelDir).filter(name => name.endsWith('.whl'))
-const wheelNames = []
+const wheelNames: string[] = []
 
-const extraAssetsExports = {}
+const extraAssetsExports: Record<string, string> = {}
 
+type Transform = (data: string) => string
 /**
  * @param {string} name name
  * @param {(data: string) => string} transform fn
  */
-function copyJsWithTransform(name, transform) {
+function copyJsWithTransform(name: string, transform: Transform|undefined=undefined) {
   const data = fs.readFileSync(`./node_modules/pyodide/${name}`, 'utf-8')
   const content = transform ? transform(data) : data
   const targetPath = `./dist/${name}`
@@ -56,7 +57,7 @@ function copyJsWithTransform(name, transform) {
 /**
  * @param {string} name name
  */
-function copyBinary(name) {
+function copyBinary(name: string) {
   const targetPath = `./dist/${name}`
   extraAssetsExports[name] = targetPath
   fs.cpSync(`./node_modules/pyodide/${name}`, targetPath)
@@ -65,7 +66,7 @@ function copyBinary(name) {
 /**
  * @param {string[]} fileNames file names
  */
-function copyCachedWhl(fileNames) {
+function copyCachedWhl(fileNames: string[]) {
   for (const name of fileNames) {
     fs.cpSync(`./cache/${name}`, `./dist/${name}`)
   }
@@ -74,7 +75,7 @@ function copyCachedWhl(fileNames) {
 /**
  * @param {string[]} fileNames file names
  */
-function checkCachedWhl(fileNames) {
+function checkCachedWhl(fileNames: string[]) {
   for (const name of fileNames) {
     if (name.endsWith('.whl')) {
       extraAssetsExports[name] = `./dist/${name}`
@@ -85,11 +86,15 @@ function checkCachedWhl(fileNames) {
 /**
  * @type {import('tsup').Options}
  */
-const commonConfig = {
+const commonConfig: Options = {
   format: ['esm'],
   dts: { resolve: true },
   treeshake: true,
   external: ['vite', 'esbuild'],
+}
+
+type PathType = {
+  path: string
 }
 
 /**
@@ -97,7 +102,7 @@ const commonConfig = {
  */
 const nodePlugin = {
   name: 'fix pyodide in node',
-  renderChunk(code, { path }) {
+  renderChunk(code: string, { path }: PathType) {
     if (path.endsWith('node.js')) {
       return {
         code: code
@@ -116,7 +121,7 @@ const nodePlugin = {
  */
 const webPlugin = {
   name: 'fix pyodide in web',
-  renderChunk(code, { path }) {
+  renderChunk(code: string, { path }: PathType) {
     if (path.endsWith('web.js')) {
       return {
         code: code
@@ -139,7 +144,7 @@ const webPlugin = {
  */
 const asmJsWebPlugin = {
   name: 'optimize pyodide.asm.js for web',
-  renderChunk(code, { path }) {
+  renderChunk(code: string, { path }: PathType) {
     if (path.endsWith('asm.js')) {
       extraAssetsExports['pyodide.web.asm.js'] = './dist/pyodide.web.asm.js'
       const trimmedCode = code
@@ -157,8 +162,8 @@ const asmJsWebPlugin = {
         .replace('"NODEFS": NODEFS,', '')
         .replace(
           /(\w+\(.*\))\.config\.indexURL/,
-          (_, prefix) => {
-            const [_node, _web] = prefix.split(':').map(s => s.trim())
+          (_, prefix: string) => {
+            const [_node, _web] = prefix.split(':').map((s: string) => s.trim())
             return `${_node} : (${_web}.config.whlURL || ${_web}.config.indexURL)`
           },
         )
@@ -300,7 +305,7 @@ loadPyodide({ packageCacheDir })
         ),
       },
     })
-    const packageJson = JSON.parse(fs.readFileSync('./package.json'))
+    const packageJson = JSON.parse(String(fs.readFileSync('./package.json')))
     packageJson.typesVersions = typesVersions
     packageJson.exports = {
       ...basicExports,
