@@ -38,7 +38,7 @@ jobs:
       - name: Build the CellDL Editor Tools
         run: |
           bun install
-          bun build:lib
+          bun run build
 
       - name: Publish the CellDL Editor on npm
         run: |
