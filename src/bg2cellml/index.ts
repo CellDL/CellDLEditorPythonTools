@@ -69,10 +69,12 @@ let bg2cellmlGlobals: PyProxy
 //==============================================================================
 //==============================================================================
 
+type Statement = object
+
 // import from @celldl/editor-types
 type RdfInterface = {
     oximockRdfModule: object
-    getRdfStatements: () => []  // $rdf.Statement
+    getRdfStatements: () => Statement[]
 }
 
 function status(msg: string, statusMsg: ((msg:string) => void)|undefined) {
