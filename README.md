@@ -1,8 +1,8 @@
-# CellML conversion for the CellDL Editor
+# CellML generation for the CellDL Editor
 
-This package provides a Javascript function to convert CellDL bond-graph models into CellML. It does so by bundling the bg2cellml Python package with Pyodide, allowing it to be used in a Javascript envirinment.
+This package provides a Javascript function to convert [BG-RDF](https://bg-rdf.org/) bond-graph models, created by the CellDL Editor, into [CellML](https://cellml.org). It does so by bundling the [bg2cellml](https://github.com/CellDL/BG-Tools) Python package with [Pyodide](https://pyodide.org), allowing it to be used in a Javascript envirinment.
 
-It is intended to be used in conjunction with the `@celldl/editor` Vue 3 component.
+It is intended to be used in conjunction with the [@celldl/editor](https://www.npmjs.com/package/@celldl/editor) Vue 3 component.
 
 
 ## Installation
@@ -59,8 +59,7 @@ vue.nextTick().then(async () => {
 import { celldl2cellml } from '@celldl/editor-tools'
 export type { CellMLOutput } from '@celldl/editor-tools'
 
-const celldl: string = '<svg><!-- Valid CellDL serialisation --></svg>'
-
+const celldl: string = '<svg><!-- Valid CellDL --></svg>'
 const celldlUri: string = `https://celldl.org/cellml/${name}`   // Some URI to identify the source
 
 const cellmlObject: CellMLOutput = celldl2cellml(`https://celldl.org/cellml/${fileHandle.name}`, celldl)
