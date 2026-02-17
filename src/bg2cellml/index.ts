@@ -90,7 +90,7 @@ export async function initialisePython(pyodideApi: PyodideAPI, rdfInterface: Rdf
         pyodide.registerJsModule("oximock", rdfInterface.oximockRdfModule)
 
         status('Loading Python packages', statusMsg)
-        const pythonPackages = Object.keys(pyodideApi.lockfile.packages)
+        const pythonPackages = Object.keys(pyodideApi.lockfile.packages).sort()
         const nPkgs = pythonPackages.length
         let n = 1
         for (const pkg of pythonPackages) {
