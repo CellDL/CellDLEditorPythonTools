@@ -51,6 +51,8 @@ def create_framework(statements: list[Triple]) -> list[str]:
     global framework
     framework = framework_from_rdf(statements)
     return get_issues(framework.issues)
+
+create_framework
 `
 
 const BG2CELLML_VERSION = `
@@ -63,8 +65,6 @@ __version__
 
 let pyodide: PyodideAPI|undefined
 let pyodideRegistered: boolean = false
-
-let bg2cellmlGlobals: PyProxy
 
 //==============================================================================
 //==============================================================================
@@ -97,10 +97,7 @@ export async function initialisePython(pyodideApi: PyodideAPI, rdfInterface: Rdf
 
         status('Loading RDF framework', statusMsg)
         const rdfStatements = rdfInterface.getRdfStatements()
-        bg2cellmlGlobals = pyodide.globals.get('dict')()
-        await pyodide.runPythonAsync(SETUP_FRAMEWORK, { globals: bg2cellmlGlobals })
-
-        const createFramework = bg2cellmlGlobals.get('create_framework')
+        const createFramework = pyodide.runPython(SETUP_FRAMEWORK)
         const issues: string[] = createFramework(rdfStatements)
         if (issues.length) {
             status(`Issues loading BG-RDF: ${issues}`, statusMsg)
@@ -134,7 +131,7 @@ bg2cellml
 
 function bg2cellml(uri: string, bgRdf: string, debug: boolean=false): CellMLOutput {
     if (pyodide) {
-        const bg2cellml = pyodide.runPython(RUN_BG2CELLML, { globals: bg2cellmlGlobals })
+        const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
         return bg2cellml(uri, bgRdf, debug)
     }
     return {
@@ -145,7 +142,7 @@ function bg2cellml(uri: string, bgRdf: string, debug: boolean=false): CellMLOutp
 export function celldl2cellml(uri: string, celldl: string, debug: boolean=false): CellMLOutput {
     if (pyodide) {
         const bgRdf = getBgRdf(celldl)
-        const bg2cellml = pyodide.runPython(RUN_BG2CELLML, { globals: bg2cellmlGlobals })
+        const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
         return bg2cellml(uri, bgRdf, debug)
     }
     return {
