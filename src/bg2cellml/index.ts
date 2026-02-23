@@ -71,7 +71,7 @@ let pyodideRegistered: boolean = false
 type Statement = object
 
 // import from @celldl/editor-types
-type RdfInterface = {
+export type RdfInterface = {
     oximockRdfModule: object
     getRdfStatements: () => Statement[]
 }
