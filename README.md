@@ -46,7 +46,7 @@ import * as $rdf from '@celldl/editor-rdf'
 import { initialisePython, type PyodideAPI } from '@celldl/editor-python-tools'
 import { loadInBrowser } from '@celldl/editor-python-tools/web'
 
-// Initialisation before importing the CellDLEditor Vue component
+// Initialise BG-RDF and Python before importing the CellDLEditor Vue component
 
 const CellDLEditor = vue.defineAsyncComponent(async () => {
 
