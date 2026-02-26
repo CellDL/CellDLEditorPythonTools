@@ -31,6 +31,11 @@ export interface CellMLOutput {
     issues?: string[]
 }
 
+export type CellMLGenerationOptions = {
+    debug?: boolean
+    rdfSource?: boolean
+}
+
 //==============================================================================
 //==============================================================================
 
@@ -144,11 +149,11 @@ function bg2cellml(uri: string, bgRdf: string, debug: boolean=false): CellMLOutp
     }
 }
 
-export function celldl2cellml(uri: string, celldl: string, debug: boolean=false): CellMLOutput {
+export function celldl2cellml(uri: string, source: string, options: CellMLGenerationOptions|undefined=undefined): CellMLOutput {
     if (pyodide) {
-        const bgRdf = getBgRdf(celldl)
+        const bgRdf = options?.rdfSource ? source : getBgRdf(source)
         const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
-        return bg2cellml(uri, bgRdf, debug)
+        return bg2cellml(uri, bgRdf, options?.debug)
     }
     return {
         issues: ['CellML conversion service has not been initialised']
