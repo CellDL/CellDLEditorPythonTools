@@ -27,12 +27,14 @@ import { getBgRdf } from './celldl'
 import { test as runTest } from './test'
 
 export interface CellMLOutput {
+    annotations?: Record<string, object>
     cellml?: string
     exception?: string
     issues?: string[]
 }
 
 export type CellMLGenerationOptions = {
+    annotate?: boolean
     debug?: boolean
     rdfSource?: boolean
 }
@@ -126,7 +128,7 @@ export async function initialisePython(pyodideApi: PyodideAPI, rdfInterface: Rdf
 const RUN_BG2CELLML = `
 from pyodide.ffi import to_js
 
-def bg2cellml(uri: str, bg_rdf: str, debug: bool=False):
+def bg2cellml(uri: str, bg_rdf: str, annotate: bool=False, debug: bool=False):
     try:
         bgrdf_model = framework.make_bondgraph_model(uri, bg_rdf, debug=debug)
         if bgrdf_model.has_issues:
@@ -134,6 +136,8 @@ def bg2cellml(uri: str, bg_rdf: str, debug: bool=False):
         else:
             cellml_model = bgrdf_model.make_cellml_model()
             result = { 'cellml': cellml_model.to_xml() }
+            if annotate:
+                result['annotations'] = cellml_model.annotations()
         return to_js(result)
     except Exception as e:
         return to_js({
@@ -158,7 +162,7 @@ export function celldl2cellml(uri: string, source: string, options: CellMLGenera
     if (pyodide) {
         const bgRdf = options?.rdfSource ? source : getBgRdf(source)
         const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
-        return bg2cellml(uri, bgRdf, options?.debug)
+        return bg2cellml(uri, bgRdf, options?.annotate, options?.debug)
     }
     return {
         issues: ['CellML conversion service has not been initialised']
