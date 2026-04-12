@@ -28,6 +28,7 @@ import { test as runTest } from './test'
 
 export interface CellMLOutput {
     cellml?: string
+    exception?: string
     issues?: string[]
 }
 
@@ -126,14 +127,18 @@ const RUN_BG2CELLML = `
 from pyodide.ffi import to_js
 
 def bg2cellml(uri: str, bg_rdf: str, debug: bool=False):
-    bgrdf_model = framework.make_bondgraph_model(uri, bg_rdf, debug=debug)
-    if bgrdf_model.has_issues:
-        result = { 'issues': get_issues(bgrdf_model.issues, debug) }
-    else:
-        cellml_model = bgrdf_model.make_cellml_model()
-        result = { 'cellml': cellml_model.to_xml() }
-    return to_js(result)
-
+    try:
+        bgrdf_model = framework.make_bondgraph_model(uri, bg_rdf, debug=debug)
+        if bgrdf_model.has_issues:
+            result = { 'issues': get_issues(bgrdf_model.issues, debug) }
+        else:
+            cellml_model = bgrdf_model.make_cellml_model()
+            result = { 'cellml': cellml_model.to_xml() }
+        return to_js(result)
+    except Exception as e:
+        return to_js({
+            exception: str(e)
+        })
 bg2cellml
 `
 
