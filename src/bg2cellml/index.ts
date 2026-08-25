@@ -45,7 +45,7 @@ export type CellMLGenerationOptions = {
 const SETUP_FRAMEWORK = `
 import traceback
 from bg2cellml.bondgraph.framework import BondgraphFramework, framework_from_rdf
-from from bg2cellml.cellml import CELLML_MODEL_URI
+from bg2cellml.cellml import CELLML_MODEL_URI
 from bg2cellml.rdf.types import Triple
 
 def get_issues(issues, debug=False) -> list[str]:
