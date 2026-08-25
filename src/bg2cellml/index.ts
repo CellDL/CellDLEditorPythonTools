@@ -85,7 +85,7 @@ export type RdfInterface = {
     getRdfStatements: () => Statement[]
 }
 
-function status(msg: string, statusMsg: ((msg:string) => void)|undefined) {
+function status(msg: string, statusMsg: ((msg:string) => void)|undefined=undefined) {
     if (statusMsg) {
         statusMsg(msg)
     }
@@ -129,7 +129,7 @@ export async function initialisePython(pyodideApi: PyodideAPI, rdfInterface: Rdf
 const RUN_BG2CELLML = `
 from pyodide.ffi import to_js
 
-def bg2cellml(uri: str, bg_rdf: str, metatata: bool=False, debug: bool=False):
+async def bg2cellml(uri: str, bg_rdf: str, metatata: bool=False, debug: bool=False):
     try:
         bgrdf_model = framework.make_bondgraph_model(uri, bg_rdf, debug=debug)
         if bgrdf_model.has_issues:
@@ -138,7 +138,7 @@ def bg2cellml(uri: str, bg_rdf: str, metatata: bool=False, debug: bool=False):
             cellml_model = bgrdf_model.make_cellml_model()
             result = { 'cellml': cellml_model.to_xml() }
             if metatata:
-                result['metatata'] = cellml_model.metadata(uri)
+                result['metatata'] = await cellml_model.metadata(uri)
         return to_js(result)
     except Exception as e:
         return to_js({
@@ -149,21 +149,21 @@ bg2cellml
 
 //==============================================================================
 
-function bg2cellml(uri: string, bgRdf: string, options: CellMLGenerationOptions|undefined=undefined): CellMLOutput {
+async function bg2cellml(uri: string, bgRdf: string, options: CellMLGenerationOptions|undefined=undefined): Promise<CellMLOutput> {
     if (pyodide) {
         const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
-        return bg2cellml(uri, bgRdf, options?.metadata, options?.debug)  // options
+        return await bg2cellml(uri, bgRdf, options?.metadata, options?.debug)  // options
     }
     return {
         issues: ['CellML conversion service has not been initialised']
     }
 }
 
-export function celldl2cellml(uri: string, source: string, options: CellMLGenerationOptions|undefined=undefined): CellMLOutput {
+export async function celldl2cellml(uri: string, source: string, options: CellMLGenerationOptions|undefined=undefined): Promise<CellMLOutput> {
     if (pyodide) {
         const bgRdf = options?.rdfSource ? source : getBgRdf(source)
         const bg2cellml = pyodide.runPython(RUN_BG2CELLML)
-        return bg2cellml(uri, bgRdf, options)
+        return await bg2cellml(uri, bgRdf, options?.metadata, options?.debug)
     }
     return {
         issues: ['CellML conversion service has not been initialised']
@@ -177,7 +177,7 @@ export async function testBg2cellml(): Promise<CellMLOutput> {
     const response = await fetch(model_uri)
     if (response.ok) {
         const model_source = await response.text()
-        const result = bg2cellml(full_uri, model_source, {
+        const result = await bg2cellml(full_uri, model_source, {
             debug: true,
             metadata: true
         })
