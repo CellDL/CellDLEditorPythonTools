@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -33,7 +33,7 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install bun
-        run: npm install -g bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Build the CellDL Editor Python Tools
         run: |
@@ -42,4 +42,4 @@ jobs:
 
       - name: Publish the CellDL Editor Python Tools on npm
         run: |
-          npm publish --access public --no-git-checks
+          npm publish --access public
