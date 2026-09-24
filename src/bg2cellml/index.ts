@@ -27,7 +27,7 @@ import { getBgRdf } from './celldl'
 import { test as runTest } from './test'
 
 export interface CellMLOutput {
-    metatata?: string       // Turtle
+    metadata?: string       // Turtle
     cellml?: string         // XML
     exception?: string
     issues?: string[]
@@ -129,7 +129,7 @@ export async function initialisePython(pyodideApi: PyodideAPI, rdfInterface: Rdf
 const RUN_BG2CELLML = `
 from pyodide.ffi import to_js
 
-async def bg2cellml(uri: str, bg_rdf: str, metatata: bool=False, debug: bool=False):
+async def bg2cellml(uri: str, bg_rdf: str, metadata: bool=False, debug: bool=False):
     try:
         bgrdf_model = framework.make_bondgraph_model(uri, bg_rdf, debug=debug)
         if bgrdf_model.has_issues:
@@ -137,8 +137,8 @@ async def bg2cellml(uri: str, bg_rdf: str, metatata: bool=False, debug: bool=Fal
         else:
             cellml_model = bgrdf_model.make_cellml_model()
             result = { 'cellml': cellml_model.to_xml() }
-            if metatata:
-                result['metatata'] = await cellml_model.metadata(uri)
+            if metadata:
+                result['metadata'] = await cellml_model.metadata(uri)
         return to_js(result)
     except Exception as e:
         return to_js({
