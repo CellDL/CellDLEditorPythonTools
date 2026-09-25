@@ -74,7 +74,9 @@ import { celldl2cellml, type CellMLOutput } from '@celldl/editor-python-tools'
 const celldl: string = '<svg><!-- Valid CellDL --></svg>'
 const celldlUri: string = `https://celldl.org/cellml/${name}`   // Some URI to identify the source
 
-const cellmlObject: CellMLOutput = celldl2cellml(celldlUri, celldl)
+const cellmlObject: CellMLOutput = celldl2cellml(celldl, {
+    sourceUri: celldlUri
+})
 
 if (cellmlObject.cellml) {
     const cellml: string = cellmlObject.cellml
